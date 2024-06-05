@@ -86,13 +86,16 @@ const FCM = (credentialPath?: string) => {
     *
     * @example
     * // Send a notification with required options
+    * const fcm = FCM("/path/to/firebase/credentials");
     * const options = {
     *   title: 'New Message',
     *   body: 'You have received a new message',
     *   topic: 'news',
+    *   imageUrl: 'https://example.image.url',
+    *   sound: 'default'
     * };
     * try {
-    *   const messageId = await sendNotification(options);
+    *   const messageId = await fcm.sendNotification(options);
     *   console.log('Notification sent. Message ID:', messageId);
     * } catch (error) {
     *   console.error('Failed to send notification:', error);
