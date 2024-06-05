@@ -44,6 +44,7 @@ const FCM = (credentialPath?: string) => {
 
         try {
             if (!credentialPath) {
+                // looking for the Firebase Admin SDK credentials if not provided as parameter
                 const files = fs.readdirSync(process.cwd());
                 const credentialFile = files.find((file) =>
                     file.includes("firebase-adminsdk") && path.extname(file) === 'json'
@@ -72,6 +73,9 @@ const FCM = (credentialPath?: string) => {
             throw err;
         }
     };
+
+    // initializing the sdk service
+    initialize();
 
     /**
     * Sends a notification using Firebase Cloud Messaging.
@@ -102,6 +106,7 @@ const FCM = (credentialPath?: string) => {
         topic = '',
     }: NotificationOptions): Promise<string> => {
         try {
+            // calling the function again to ensure that the sdk is initialized beforesend notification
             initialize();
 
             if (!topic || topic.trim() === '') {
@@ -110,6 +115,7 @@ const FCM = (credentialPath?: string) => {
                 );
             }
 
+            // forming the notification object
             const messageBody: admin.messaging.Message = {
                 apns: {
                     payload: {
