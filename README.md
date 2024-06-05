@@ -92,7 +92,7 @@ Sends a notification using Firebase Cloud Messaging with the provided options.
 
 * options (NotificationOptions): The notification options.
 
-    * title (string): The title of the notification.
+    * `title` (string): The title of the notification.
     * `body` (string): The body of the notification.
     * `topic` (string): The topic to which the notification will be sent.
     * `imageUrl` (string, optional): The URL of the image to be included in the notification.
