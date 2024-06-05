@@ -102,7 +102,7 @@ Sends a notification using Firebase Cloud Messaging with the provided options.
 * `Promise<string>`: The message ID of the sent notification.
 
 # Note
-This package is created as part of a learning process. Feedback and contributions are welcome! Feel free to open issues or pull requests on [GitHub]().
+This package is created as part of a learning process. Feedback and contributions are welcome! Feel free to open issues or pull requests on [GitHub](https://github.com/PrantaDas/firemsg).
 
 License
-This project is licensed under the [MIT License]().
+This project is licensed under the [MIT License](https://github.com/PrantaDas/firemsg/blob/main/LICENSE).
