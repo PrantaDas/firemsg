@@ -1,0 +1,54 @@
+{
+  "name": "firemsg",
+  "version": "1.0.0",
+  "description": "A simple wrapper for firebase cloud messaging service",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "typeRoots": [
+    "./node_modules/@types",
+    "./types"
+  ],
+  "exports": {
+    ".": {
+      "require": "./dist/index.js",
+      "import": "./dist/index.js",
+      "types": "./dist/index.d.ts"
+    }
+  },
+  "scripts": {
+    "build": "tsc"
+  },
+  "keywords": [
+    "firebase",
+    "fcm",
+    "notification",
+    "messaging",
+    "push",
+    "andoroid",
+    "ios",
+    "firebase cloud messaging",
+    "push notification"
+  ],
+  "files": [
+    "dist",
+    "README.md",
+    "LICENSE"
+  ],
+  "author": {
+    "name": "Pranta Das",
+    "email": "prantodas043@gmail.com",
+    "url": "https://github.com/Prantadas"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/PrantaDas/express-pulse-logger.git"
+  },
+  "license": "MIT",
+  "devDependencies": {
+    "@types/node": "^20.12.7",
+    "typescript": "^5.4.5"
+  },
+  "dependencies": {
+    "firebase-admin": "^12.1.1"
+  }
+}
