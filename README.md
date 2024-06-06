@@ -41,7 +41,10 @@ const options: NotificationOptions = {
 
 // Send a notification
 try {
-    const messageId = await fcm.sendNotification(options);
+    // optional, if the credentials file is present in the root driectory of the application
+    const credentialPath ="path/to/credentials/json"
+    const fcm = FCM("app_name", credentialPath);
+    const messageId = await fcm.send(options);
     console.log('Notification sent. Message ID:', messageId);
 } catch (error) {
     console.error('Failed to send notification:', error);
@@ -53,8 +56,11 @@ First, require the package and initialize the Firebase Cloud Messaging service w
 ```js
 const { FCM } = require('firemsg');
 
+
+// optional, if the credentials file is present in the root driectory of the application
+const credentialPath ="path/to/credentials/json"
 // Initialize FCM service with Firebase Admin SDK JSON file path
-const fcm = FCM('./path/to/credentials.json');
+const fcm = FCM("app_name", credentialPath);
 
 // Define notification options
 const options = {
@@ -66,7 +72,7 @@ const options = {
 };
 
 // Send a notification
-fcm.sendNotification(options)
+fcm.send(options)
     .then((messageId) => {
         console.log('Notification sent. Message ID:', messageId);
     })
@@ -76,15 +82,17 @@ fcm.sendNotification(options)
 ```
 
 # API
-`FCM(credentialPath: string): { sendNotification: (options: NotificationOptions) => Promise<string> }`
+`FCM(name: string, credentialPath?: string): { send: (options: NotificationOptions) => Promise<string> }`
 
-Initializes the  Firebase Cloud Messaging service  service with the provided Firebase Admin SDK JSON file path. Returns an object with a sendNotification method.
+Initializes the  Firebase Cloud Messaging service  service with the provided Firebase Admin SDK JSON file path. Returns an object with a `send` method.
 
 ### Parameters
 
-* `credentialPath` (string): The path to the Firebase Admin SDK JSON file.
+* `name` (string) : The name of the service
 
-`sendNotification(options: NotificationOptions): Promise<string>`
+* `credentialPath` (string,optional): The path to the Firebase Admin SDK JSON file.
+
+`send(options: NotificationOptions): Promise<string>`
 
 Sends a notification using Firebase Cloud Messaging with the provided options.
 
@@ -97,6 +105,7 @@ Sends a notification using Firebase Cloud Messaging with the provided options.
     * `topic` (string): The topic to which the notification will be sent.
     * `imageUrl` (string, optional): The URL of the image to be included in the notification.
     * `sound` (string, optional): The sound to be played when the notification is received.
+    * `data` (`Data`,optional): The addtional data to be sent with the notification.
 
 ### Returns
 * `Promise<string>`: The message ID of the sent notification.

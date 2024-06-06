@@ -7,31 +7,45 @@
  */
 
 
-import * as path from 'path';
-import * as fs from 'fs';
-import * as admin from 'firebase-admin';
-import { getMessaging } from 'firebase-admin/messaging';
+import path from 'node:path';
+import fs from 'node:fs';
+import admin from 'firebase-admin';
+import { AppName, NotificationOptions } from './types';
+import { EmptyTopicError, FirebaseAdminSDKjsonNotFoundError } from './customError';
 
 
 /**
- * Interface for notification options.
+ * Checking the installed environment
  */
-interface NotificationOptions {
-    title: string;
-    body: string;
-    sound: string;
-    topic: string;
-    imageUrl?: string;
-};
 
+// Only Node.js has a process variable that is of [[Class]] process
+const processGlobal = typeof process !== 'undefined' ? process : 0;
+
+if (Object.prototype.toString.call(processGlobal) !== '[object process]') {
+    const message = `
+        ==========Warning===========
+
+        firemsg appears to have been installed in an unsupported environment.
+        This package should only be used in server-side or backend Node.js environments,
+        and should not be used in web browsers or other client-side environments.
+    `;
+    console.error(message);
+}
 
 /**
  * Initializes the Firebase Cloud Messaging service.
  *
+ * @param {string} name - The app name.Ex: 'android' | 'ios .
  * @param  {string} credentialPath - The optional path to the Firebase Admin SDK JSON file.
- * @returns An object with the sendNotification method.
+ * @returns An object with the send method.
  */
-const FCM = (credentialPath?: string) => {
+const FCM = (name: AppName, credentialPath?: string) => {
+
+
+
+    if (!name || name.trim().length === 0) {
+        throw new Error('App name cannot be empty');
+    }
 
     let initialized: boolean = false;
 
@@ -47,13 +61,11 @@ const FCM = (credentialPath?: string) => {
                 // looking for the Firebase Admin SDK credentials if not provided as parameter
                 const files = fs.readdirSync(process.cwd());
                 const credentialFile = files.find((file) =>
-                    file.includes("firebase-adminsdk") && path.extname(file) === 'json'
+                    file.includes("firebase-adminsdk") && path.extname(file) === '.json'
                 );
 
                 if (!credentialFile) {
-                    throw new Error(
-                        'Firebase Admin SDK JSON file not found in the root directory and no path provided'
-                    );
+                    throw new FirebaseAdminSDKjsonNotFoundError();
                 }
 
                 credentialPath = path.join(process.cwd(), credentialFile);
@@ -63,14 +75,24 @@ const FCM = (credentialPath?: string) => {
 
             admin.initializeApp({
                 credential
-            });
+            }, name);
 
             initialized = true;
-            console.log("🔔 Notification service initialized");
-        } catch (err) {
-            console.error('Initialization error\n', err);
+        } catch (err: any) {
+            console.error("Initialization error:\n");
+            switch (err.name) {
+                case 'EmptyTopicError':
+                    console.error(err.message);
+                    break;
+                case 'FirebaseAdminSDKjsonNotFoundError':
+                    console.error(err.message);
+                    break;
+                default:
+                    console.error(err);
+                    break;
+            }
             // Re-throwing the error to ensure it can be handled by the caller
-            throw err;
+            // throw err;
         }
     };
 
@@ -82,7 +104,7 @@ const FCM = (credentialPath?: string) => {
     *
     * @param {NotificationOptions} options - The notification options.
     * @returns {Promise<string>} - The message ID of the sent notification.
-    * @throws Will throw an error if sending the notification fails.
+    * @throws {EmptyTopicError} - Will throw an error if the topic in empty.
     *
     * @example
     * // Send a notification with required options
@@ -92,65 +114,56 @@ const FCM = (credentialPath?: string) => {
     *   body: 'You have received a new message',
     *   topic: 'news',
     *   imageUrl: 'https://example.image.url',
-    *   sound: 'default'
+    *   sound: 'default',
+    *   data: {
+    *       "key":"value"
+    *   }
     * };
     * try {
-    *   const messageId = await fcm.sendNotification(options);
+    *   const messageId = await fcm.send(options);
     *   console.log('Notification sent. Message ID:', messageId);
     * } catch (error) {
     *   console.error('Failed to send notification:', error);
     * }
     */
-    const sendNotification = async ({
+    const send = async ({
         title,
         body,
-        imageUrl = '',
-        sound = 'default',
-        topic = '',
+        topic,
+        sound,
+        imageUrl,
+        data
     }: NotificationOptions): Promise<string> => {
-        try {
-            // calling the function again to ensure that the sdk is initialized beforesend notification
-            initialize();
+        // calling the function again to ensure that the sdk is initialized before send notification
+        initialize();
 
-            if (!topic || topic.trim() === '') {
-                throw new Error(
-                    'Topic can\'t be empty,Either provide a topic or provide a token'
-                );
-            }
+        if (!topic || topic.trim() === '') {
+            throw new EmptyTopicError();
+        }
 
-            // forming the notification object
-            const messageBody: admin.messaging.Message = {
-                apns: {
-                    payload: {
-                        aps: {
-                            sound
-                        }
+        // forming the notification object
+        const messageBody: admin.messaging.Message = {
+            apns: {
+                payload: {
+                    aps: {
+                        sound
                     }
-                },
-                notification: {
-                    title,
-                    body,
-                    imageUrl
-                },
-                topic
-            };
+                }
+            },
+            notification: {
+                title,
+                body,
+                ...(imageUrl && { imageUrl })
+            },
+            topic,
+            ...(data && { data })
+        };
 
-            if (!imageUrl) {
-                delete messageBody.notification?.imageUrl;
-            }
-
-            const messageId = await getMessaging().send(messageBody);
-            console.log("💥 Notification sent");
-            return messageId;
-        }
-        catch (err) {
-            console.error('Error Sending Notification:\n', err);
-            // Re-throwing the error to ensure it can be handled by the caller
-            throw err;
-        }
+        const messageId = await admin.messaging().send(messageBody);
+        return messageId;
     };
 
-    return { sendNotification };
+    return { send };
 };
 
 export { FCM };
