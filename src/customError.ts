@@ -17,3 +17,10 @@ export class FirebaseAdminSDKjsonNotFoundError extends Error {
         this.name = 'FirebaseAdminSDKjsonNotFoundError';
     }
 }
+
+export class EmptyAppNameError extends Error {
+    constructor() {
+        super('App name cannot be empty, this will result an error of firebase admin authentication if another instance is created.');
+        this.name = 'EmptyAppNameError';
+    }
+}

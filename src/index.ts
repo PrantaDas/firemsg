@@ -11,7 +11,7 @@ import path from 'node:path';
 import fs from 'node:fs';
 import admin from 'firebase-admin';
 import { AppName, NotificationOptions } from './types';
-import { EmptyTopicError, FirebaseAdminSDKjsonNotFoundError } from './customError';
+import { EmptyAppNameError, EmptyTopicError, FirebaseAdminSDKjsonNotFoundError } from './customError';
 
 
 /**
@@ -41,10 +41,8 @@ if (Object.prototype.toString.call(processGlobal) !== '[object process]') {
  */
 const FCM = (name: AppName, credentialPath?: string) => {
 
-
-
     if (!name || name.trim().length === 0) {
-        throw new Error('App name cannot be empty');
+        throw new EmptyAppNameError();
     }
 
     let initialized: boolean = false;
@@ -79,11 +77,14 @@ const FCM = (name: AppName, credentialPath?: string) => {
 
             initialized = true;
         } catch (err: any) {
-            console.error("Initialization error:\n");
             switch (err.name) {
                 case 'FirebaseAdminSDKjsonNotFoundError':
+                    console.error("Initialization error:\n");
                     console.error(err.message);
                     break;
+                case 'EmptyAppNameError':
+                    console.error('Warniing:\n');
+                    console.error(err.message);
                 default:
                     console.error(err);
                     break;
