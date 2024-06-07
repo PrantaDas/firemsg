@@ -81,9 +81,6 @@ const FCM = (name: AppName, credentialPath?: string) => {
         } catch (err: any) {
             console.error("Initialization error:\n");
             switch (err.name) {
-                case 'EmptyTopicError':
-                    console.error(err.message);
-                    break;
                 case 'FirebaseAdminSDKjsonNotFoundError':
                     console.error(err.message);
                     break;
@@ -131,35 +128,47 @@ const FCM = (name: AppName, credentialPath?: string) => {
         sound,
         imageUrl,
         data
-    }: NotificationOptions): Promise<string> => {
+    }: NotificationOptions): Promise<string | undefined> => {
         // calling the function again to ensure that the sdk is initialized before send notification
         initialize();
 
-        if (!topic || topic.trim() === '') {
-            throw new EmptyTopicError();
-        }
+        try {
+            if (!topic || topic.trim() === '') {
+                throw new EmptyTopicError();
+            }
 
-        // forming the notification object
-        const messageBody: admin.messaging.Message = {
-            apns: {
-                payload: {
-                    aps: {
-                        sound
+            // forming the notification object
+            const messageBody: admin.messaging.Message = {
+                apns: {
+                    payload: {
+                        aps: {
+                            sound
+                        }
                     }
-                }
-            },
-            notification: {
-                title,
-                body,
-                ...(imageUrl && { imageUrl })
-            },
-            topic,
-            ...(data && { data })
-        };
+                },
+                notification: {
+                    title,
+                    body,
+                    ...(imageUrl && { imageUrl })
+                },
+                topic,
+                ...(data && { data })
+            };
 
-        const messageId = await admin.messaging().send(messageBody);
-        return messageId;
+            const messageId = await admin.messaging().send(messageBody);
+            return messageId;
+        } catch (err: any) {
+            switch (err.name) {
+                case 'EmptyTopicError':
+                    console.error(err.message);
+                    break;
+                default:
+                    console.error(err);
+                    break;
+            }
+        }
     };
+
 
     return { send };
 };
