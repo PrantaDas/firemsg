@@ -91,8 +91,6 @@ const FCM = (name: AppName, credentialPath?: string) => {
                     console.error(err);
                     break;
             }
-            // Re-throwing the error to ensure it can be handled by the caller
-            // throw err;
         }
     };
 
