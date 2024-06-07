@@ -27,8 +27,11 @@ First, import the package and initialize the `firemsg` with the path to your Fir
 ```ts
 import { FCM, NotificationOptions } from 'firemsg';
 
+// optional, if the credentials file is present in the root driectory of the application
+const credentialPath ="path/to/credentials/json"
+
 // Initialize FCM service with Firebase Admin SDK JSON file path
-const fcm = FCM('./path/to/credentials.json');
+const fcm = FCM(credentialPath);
 
 // Define notification options
 const options: NotificationOptions = {
