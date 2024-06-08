@@ -116,7 +116,7 @@ const FCM = (name: AppName, credentialPath?: string) => {
         data
     }: NotificationOptions): Promise<string | undefined> => {
         // calling the function again to ensure that the sdk is initialized before send notification
-        // initialize();
+        initialize();
 
         if (!topic || topic.trim().length === 0) {
             throw new EmptyTopicError();

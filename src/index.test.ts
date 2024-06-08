@@ -14,7 +14,7 @@ describe("FCM Wrapper", () => {
     });
 
     it("Should not throw an error if the credentials file is in the root directory or path is provided", () => {
-        expect(() => FCM("test-app")).not.toThrow(FirebaseAdminSDKjsonNotFoundError);
+        expect(() => FCM("test-app1")).not.toThrow(FirebaseAdminSDKjsonNotFoundError);
     });
 
     // it("Should throw an error if the credentials are not in the root or path not provided", () => {
@@ -22,12 +22,12 @@ describe("FCM Wrapper", () => {
     // });
 
     it("Should return a function name send if initialized successfully", () => {
-        const fcm = FCM("test-app");
+        const fcm = FCM("test-app2");
         expect(typeof fcm.send).toBe("function");
     });
 
     it("Should throw an error if the topic is empty or not provided in send function", async () => {
-        const fcm = FCM("test-app");
+        const fcm = FCM("test-app3");
         await expect(fcm.send({ title: 'test-title', body: 'test-body', topic: '' })).rejects.toBeInstanceOf(EmptyTopicError);
     });
 
