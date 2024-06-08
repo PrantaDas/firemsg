@@ -35,7 +35,7 @@ if (Object.prototype.toString.call(processGlobal) !== '[object process]') {
 /**
  * Initializes the Firebase Cloud Messaging service.
  *
- * @param {string} name - The app name.Ex: 'android' | 'ios .
+ * @param {string} name - The app name.Ex: 'android' | 'ios .The app name should be unique for each instance.
  * @param  {string} credentialPath - The optional path to the Firebase Admin SDK JSON file.
  * @returns An object with the send method.
  */
