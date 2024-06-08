@@ -53,6 +53,7 @@
     "typescript": "^5.4.5"
   },
   "dependencies": {
+    "@types/jest": "^29.5.12",
     "firebase-admin": "^12.1.1"
   }
 }

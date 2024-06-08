@@ -4,8 +4,8 @@
 export interface NotificationOptions {
     title: string;
     body: string;
-    sound: string | "default";
     topic: string;
+    sound?: string | "default";
     data?: Data;
     imageUrl?: string;
 };
@@ -17,4 +17,4 @@ export interface Data {
 /**
  * Type of app name.
  */
-export type AppName = "android" | "ios";
+export type AppName = string | "android" | "ios";

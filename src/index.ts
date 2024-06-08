@@ -54,42 +54,27 @@ const FCM = (name: AppName, credentialPath?: string) => {
     const initialize = (): void => {
         if (initialized) return;
 
-        try {
-            if (!credentialPath) {
-                // looking for the Firebase Admin SDK credentials if not provided as parameter
-                const files = fs.readdirSync(process.cwd());
-                const credentialFile = files.find((file) =>
-                    file.includes("firebase-adminsdk") && path.extname(file) === '.json'
-                );
+        if (!credentialPath) {
+            // looking for the Firebase Admin SDK credentials if not provided as parameter
+            const files = fs.readdirSync(process.cwd());
+            const credentialFile = files.find((file) =>
+                file.includes("firebase-adminsdk") && path.extname(file) === '.json'
+            );
 
-                if (!credentialFile) {
-                    throw new FirebaseAdminSDKjsonNotFoundError();
-                }
-
-                credentialPath = path.join(process.cwd(), credentialFile);
+            if (!credentialFile) {
+                throw new FirebaseAdminSDKjsonNotFoundError();
             }
 
-            const credential = admin.credential.cert(path.resolve(credentialPath));
-
-            admin.initializeApp({
-                credential
-            }, name);
-
-            initialized = true;
-        } catch (err: any) {
-            switch (err.name) {
-                case 'FirebaseAdminSDKjsonNotFoundError':
-                    console.error("Initialization error:\n");
-                    console.error(err.message);
-                    break;
-                case 'EmptyAppNameError':
-                    console.error('Warniing:\n');
-                    console.error(err.message);
-                default:
-                    console.error(err);
-                    break;
-            }
+            credentialPath = path.join(process.cwd(), credentialFile);
         }
+
+        const credential = admin.credential.cert(path.resolve(credentialPath));
+
+        admin.initializeApp({
+            credential
+        }, name);
+
+        initialized = true;
     };
 
     // initializing the sdk service
@@ -126,48 +111,37 @@ const FCM = (name: AppName, credentialPath?: string) => {
         title,
         body,
         topic,
-        sound,
+        sound = 'default',
         imageUrl,
         data
     }: NotificationOptions): Promise<string | undefined> => {
         // calling the function again to ensure that the sdk is initialized before send notification
-        initialize();
+        // initialize();
 
-        try {
-            if (!topic || topic.trim() === '') {
-                throw new EmptyTopicError();
-            }
-
-            // forming the notification object
-            const messageBody: admin.messaging.Message = {
-                apns: {
-                    payload: {
-                        aps: {
-                            sound
-                        }
-                    }
-                },
-                notification: {
-                    title,
-                    body,
-                    ...(imageUrl && { imageUrl })
-                },
-                topic,
-                ...(data && { data })
-            };
-
-            const messageId = await admin.messaging().send(messageBody);
-            return messageId;
-        } catch (err: any) {
-            switch (err.name) {
-                case 'EmptyTopicError':
-                    console.error(err.message);
-                    break;
-                default:
-                    console.error(err);
-                    break;
-            }
+        if (!topic || topic.trim().length === 0) {
+            throw new EmptyTopicError();
         }
+
+        // forming the notification object
+        const messageBody: admin.messaging.Message = {
+            apns: {
+                payload: {
+                    aps: {
+                        sound
+                    }
+                }
+            },
+            notification: {
+                title,
+                body,
+                ...(imageUrl && { imageUrl })
+            },
+            topic,
+            ...(data && { data })
+        };
+
+        const messageId = await admin.messaging().send(messageBody);
+        return messageId;
     };
 
 
