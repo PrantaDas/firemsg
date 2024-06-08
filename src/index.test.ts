@@ -1,12 +1,5 @@
 import { FCM } from ".";
-import admin from "firebase-admin";
-import fs from "fs";
-import path from "path";
 import { EmptyAppNameError, EmptyTopicError, FirebaseAdminSDKjsonNotFoundError } from "./customError";
-
-jest.mock("fs");
-jest.mock("firebase-admin");
-jest.mock("path");
 
 describe("FCM Wrapper", () => {
 
