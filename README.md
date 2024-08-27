@@ -8,17 +8,17 @@ You can install **firemsg** using `npm`, `yarn`, `pnpm`.
 
 ## npm
 ```sh
-npm i firemsg
+<not published yet>
 ```
 
 ## pnpm
 ```sh
-pnpm install firemsg
+<not published yet>
 ```
 
 ## yarn
 ```sh
-yarn add firemsg
+<not published yet>
 ```
 
 # Example 
